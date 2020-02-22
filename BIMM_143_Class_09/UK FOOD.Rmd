@@ -1,0 +1,137 @@
+---
+title: "CLASS_09_UKFOOD_DATA"
+author: "Vicky Vu"
+date: "2/4/2020"
+output: html_document
+---
+https://bioboot.github.io/bggn213_W19/class-material/lab-8-bggn213.html
+# PCA
+##PCA of UK food data 
+
+```{r}
+x <-read.csv("UK_foods.csv", row.names = 1) #row.name tells us to take the first column and turn it into the row name.
+x
+```
+Q1. How many rows and columns are in your new data frame named x? What R functions could you use to answer this questions?
+```{r}
+nrow(x)
+ncol(x)
+```
+
+At this point, let's check our data and make sure it's imported correctly. 
+```{r}
+head(x)
+tail(x)
+```
+To format this chart correctly, add row.names = 1 to indicate that the first row is the names colum.
+
+## Spotting major differences and trends.
+```{r}
+barplot(as.matrix(x), beside=T, col=rainbow(nrow(x)))
+```
+This plot is too difficult to understand!
+
+
+Let's make some plots to explore our data a bit more. 
+```{r}
+pairs(x, col=rainbow(10), pch=16)
+```
+This plot tells us that the x and y axis are indicated by the location of each country. 
+
+##Principal Componrnt Analysis (PCA) "prcomp()" function. 
+A pairwise plot could be useful to identify relationships  between variables but this small dataset gave us a large plot. Doesn't seem practical. 
+
+PCA can do this much more easily. In this data set, we have 4 countries and 17 dimensions to look at. PCA can plot 4 coordinates in a 17 dimensional space. 
+
+The prcom() function expects the observations to be rows and the variables to be colums so we first need to transpose our data.frame matrix with t(). 
+
+t() will flip the columns to rows and vice versa. 
+```{r}
+pca <- prcomp(t(x))
+
+summary ( pca)
+```
+
+Q. What is in my result object "pca"? I can check the attribtes 
+```{r}
+attributes(pca)
+
+```
+
+
+
+The largest variance is PC1 followed by PC2, and PC3. 
+In this summary, we see that PC1 accounts for more than 67% of the sample variance. PC1 and PC2 captures 96% of the original 17 dimensional variance, so we can start with PC1 v. PC2. 
+```{r}
+plot(pca$x[,1], pca$x[,2], xlab="PC1", ylab="PC2", xlim=c(-270,500))
+text(pca$x[,1], pca$x[,2], colnames(x), col = rainbow (4))
+```
+
+How do you know the variation in the original data each PC accounts for?
+
+```{r}
+v <- round( pca$sdev^2/sum(pca$sdev^2) * 100 )
+v
+
+
+## or the second row here...
+z <- summary(pca)
+z$importance
+```
+This information can be summarized in a plot of variance with respect to the principal component number. 
+
+```{r}
+barplot (v, xlab = "Principle Component", ylab = "Percent Variation")
+```
+
+
+##Variable Loadings 
+What is the impact of each original variable on the principal component?
+
+```{r}
+## Lets focus on PC1 as it accounts for > 90% of variance 
+par(mar=c(10, 3, 0.35, 0))
+barplot( pca$rotation[,1], las=2 )
+
+```
+
+Here we see observations (foods) with the largest positive loading scores that effectively “push” N. Ireland to right positive side of the plot (including Fresh_potatoes and Soft_drinks).
+
+We can also see the observations/foods with high negative scores that push the other countries to the left side of the plot (including Fresh_fruit and Alcoholic_drinks).
+
+```{r}
+## Next we'll create the samle "loading pot" for PC2. 
+par(mar=c(10, 3, 0.35, 0))
+barplot( pca$rotation[,2], las=2 )
+```
+
+## Biplots 
+Another way to see information with the PCA plot. 
+```{r}
+## The inbuilt biplot() can be useful for small datasets 
+biplot(pca)
+```
+
+Observe here that there is a central group of foods (red arrows) around the middle of each principal component, with four on the periphery that do not seem to be part of the group. Recall the 2D score plot (Figure above), on which England, Wales and Scotland were clustered together, whilst Northern Ireland was the country that was away from the cluster. Perhaps there is some association to be made between the four variables that are away from the cluster in the main PCA plot and the country that is located away from the rest of the countries i.e. Northern Ireland.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

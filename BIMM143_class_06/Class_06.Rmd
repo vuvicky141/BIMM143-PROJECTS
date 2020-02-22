@@ -1,0 +1,238 @@
+---
+title: 'Class 6: R Function'
+author: "Vicky Vu"
+date: "1/23/2020"
+output:
+  word_document: default 
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Functions 
+
+Read table functions 
+  1. read.table("filename.txt", header=TRUE, sep="\t")
+  
+  2. separater type consists of \t  "," is comma, ";" is semicolin, "" is white space 
+  
+  3. read.delim
+  
+Lets see more about **file import** (i.e. reading files into R). The main read function in base R is `read.table()`
+
+```{r}
+t1 <- read.table("test1.txt", header=TRUE, sep=",")
+t1
+```
+You could also use `read.csv` which has the arguments I want in this case.
+```{r}
+t1 <- read.csv("test1.txt")
+t1
+```
+
+
+```{r}
+t2 <- read.table("test2.txt", header=TRUE, sep="$")
+t2
+```
+
+
+```{r}
+t3 <- read.table("test3.txt")
+t3
+```
+
+# Back To Functions
+```{r}
+add <- function(x, y=1) {
+ # Sum the input x and y
+ x + y
+} 
+```
+
+using this function 
+
+```{r}
+
+add(7,3)
+add(x=1, y=4)
+add(1, 4)
+add(1)
+add(3)
+
+```
+
+How does this work with ventors?
+```{r}
+add( c(1, 2, 4) )
+add( c(1, 2, 4), 4 )
+add( c(1, 2, 4), c(4, 5, 6) )
+
+```
+
+
+What is this `range()` function?
+```{r}
+x <- c(4,4,10,11,1)
+max(x)
+min (x)
+range(x)
+rng <- range(x)
+rng
+```
+This is our second function 
+
+
+
+```{r}
+rescale <- function(x) {
+ rng <-range(x)
+ (x - rng[1]) / (rng[2] - rng[1])
+}
+rescale(1:10)
+rescale( c(1,2,NA,3,10) )
+
+```
+```{r}
+rescale2 <- function(x) {
+  rng <- range (x, na.rm=TRUE)
+   (x - rng[1]) / (rng[2] - rng[1])
+}
+
+```
+
+```{r}
+rescale2( c(1,2,NA,3,10) )
+```
+
+
+Going too far!
+```{r}
+rescale3 <- function(x, na.rm=TRUE, plot=FALSE) {
+ rng <-range(x, na.rm=na.rm)
+ print("Hello")
+ 
+ answer <- (x - rng[1]) / (rng[2] - rng[1])
+ 
+ print("is it me you are looking for?")
+ 
+ if(plot) {
+   print("don't sing again")
+ plot(answer, typ="b", lwd=4)
+ }
+ print("I can see it in ...")
+ return(answer)
+}
+```
+```{r}
+rescale3(x, plot=TRUE)
+```
+
+```{r}
+rescale3(x, plot=FALSE)
+```
+
+## Hands on Worksheet Part B 
+```{r}
+
+library(bio3d)
+s1 <- read.pdb("4AKE") # kinase with drug
+s2 <- read.pdb("1AKE") # kinase no drug
+s3 <- read.pdb("1E4Y") # kinase with drug
+
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s1, chain="A", elety="CA")
+
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+
+```
+Q1. What type of object is returned from the read.pdb() function?
+It is a list of 8 things and of class "pdb", "sse"
+```{r}
+s1
+
+```
+```{r}
+class(s1)
+
+```
+```{r}
+str(s1)
+```
+```{r}
+aa321(s1$seqres)
+```
+
+```{r}
+s1$atom
+```
+
+
+Q2. What does the trim.pdb() function do?
+```{r}
+trim.pdb(s1, chain="A", elety="CA")
+```
+
+
+It makes it smaller. 
+
+```
+
+
+Q3. What input parameter would turn off the marginal black and grey rectangles in the
+plots and what do they represent in this case?
+
+
+Q4. What would be a better plot to compare across the different proteins?
+If the 3 plots where put together into 1 plot. 
+
+
+
+
+```
+
+```
+
+
+
+
+Q5. Which proteins are more similar to each other in their B-factor trends. How could
+you quantify this?
+s1.b and s3.b are more similar to each other 
+```{r}
+hc <- hclust( dist( rbind(s1.b, s2.b, s3.b) ) )
+plot(hc)
+
+```
+
+
+
+
+Q6. How would you generalize the original code above to work with any set of input
+protein structures?
+
+
+
+
+### Level 3 Heading 
+
+
+
+
+
+
+
+
+
+
+
+

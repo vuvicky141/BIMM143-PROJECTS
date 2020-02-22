@@ -1,0 +1,210 @@
+---
+title: "Class_07"
+author: "Vicky Vu"
+date: "1/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+These are the functions from last lecture.
+
+```{r}
+function(x, na.rm=TRUE, plot=FALSE, ...) {
+  # Our rescale function from the end of lecture 9
+
+  if(na.rm) {
+    rng <-range(x, na.rm=TRUE)
+  } else {
+    rng <-range(x)
+  }
+
+  answer <- (x - rng[1]) / (rng[2] - rng[1])
+  if(plot) { 
+    plot(answer, ...) 
+  }
+
+
+  return(answer)
+}
+
+```
+
+#Functions warning() and stop () 
+```{r}
+function(x, na.rm=TRUE, plot=FALSE, ...) {
+  
+  if( !is.numeric(x) ) {
+    stop("Input x should be numeric", call.=FALSE)
+  }
+  
+  if(na.rm) {
+    rng <-range(x, na.rm=TRUE)
+  } else {
+    rng <-range(x)
+  }
+
+  answer <- (x - rng[1]) / (rng[2] - rng[1])
+  if(plot) { 
+    plot(answer, ...) 
+  }
+
+
+  return(answer)
+}
+```
+#Excercise 
+```{r}
+x <- c( 1, 2, NA, 3, NA)
+y <- c(NA, 3, NA, 3, 4)
+
+is_both_na <- function ( x,y ){
+  is.na(x) & is.na(y)
+}
+is_both_na(x,y)
+```
+```{r}
+x <- c( 1, 2, NA, 3, NA)
+y <- c(NA, 3, NA, 3, 4)
+z <- c(1,1)
+
+both_na3 <- function(x, y) {
+ if(length(x) != length(y)) {
+ stop("Input x and y should be vectors of the same length")
+ }
+
+ na.in.both <- ( is.na(x) & is.na(y) )
+ na.number <- sum(na.in.both)
+ na.which <- which(na.in.both)
+ message("Found ", na.number, " NA's at position(s):",
+ paste(na.which, collapse=", ") )
+
+ return( list(number=na.number, which=na.which) )
+}
+
+```
+
+# slide 32 
+```{r}
+x <- df1$IDs
+y <- df2$IDs
+
+
+#Are all the same 
+df1$IDs
+df1 [,"IDs"]
+gene.colname = "IDs"
+df1 [, gene.colname]
+
+colnames(df1) <- c( "new_name" , "exp")
+colnames(df2) <- c("new_name", "exp")
+        
+
+
+gene_intersect2 <- function(df1, df2) {
+  cbind (df1[df1$IDs %in% df2$IDs, ],
+         df2[df2$IDs %in% df1$IDs, ], "exp")
+}
+
+gene_intersect2(df1, df2)
+```
+
+
+```{r}
+gene_intersect(x,y )
+
+x %in% y 
+#which entries in x, fulfills the condidtion of x in y 
+
+x[x %in% y]
+#takes all of x and sees if it exist in y 
+```
+
+
+```{r}
+y %in% x 
+y[y %in% x]
+```
+
+
+```{r}
+gene_intersect <- function(x, y) {
+  cbind (x[x %in% y],y[y %in% x])
+}
+
+gene_intersect(x,y)
+```
+
+```{r}
+gene_intersect3 <- function(df1, df2, gene.colname = "new_name ") {
+  cbind (df1[df1$IDs %in% df2$IDs, ],
+         df2[df2$IDs %in% df1$IDs, ], "exp")
+}
+
+gene_intersect3(df1, df2, gene.colname = "exp")
+
+```
+
+
+# Sldie 54 
+
+```{r}
+# student 1
+s1 <- c(100, 100, 100, 100, 100, 100, 100, 90)
+# student 2
+s2 <- c(100, NA, 90, 90, 90, 90, 97, 80)
+
+
+# to drop the lowest value 
+min (s1)
+print (s1
+
+
+
+
+```
+
+#slide 69 
+
+```{r}
+install.packages ('ggplot2')
+library( "ggplot2")
+```
+
+
+```{r}
+dim (iris)
+class (iris)
+head (iris )
+levels(iris$Species)
+
+# Aestetics ( aes)
+myplot <- ggplot (data = iris, aes(x= Sepal.Width))
+class(myplot)
+
+#Geometry 
+ggplot (data = iris, aes(x= Sepal.Length, y = Sepal.Width))+
+geom_point(size = 2)
+
+ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) + geom_point (size = 3 )
+
+ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) + geom_point (aes(shape = Species),size = 3 )
+
+ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) + geom_point (aes(shape = Species),size = 3 ) +
+  geom_smooth(method = "lm")
+```
+
+
+```{r}
+# showing distribution 
+ggplot(iris, aes(Sepal.Length, fill = Species))+ 
+  geom_bar(stat = 'count')
+
+ggplot(iris, aes(Sepal.Length, fill = Species))+ 
+  geom_bar(stat = 'count', alpha = 0.7)
+```
+
+
+```{r}

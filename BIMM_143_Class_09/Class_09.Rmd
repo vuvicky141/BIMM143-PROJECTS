@@ -1,0 +1,193 @@
+---
+title: "Class_09"
+author: "Vicky Vu"
+date: "2/4/2020"
+output: html_document
+---
+# K means clustering 
+Starting with example data. 
+```{r}
+tmp <- c(rnorm(30,-3), rnorm(30,3))
+#rnorm is a random normal distribution that is 30 points centered at -3, and 30 points centered at 3.
+x <- cbind(x=tmp, y=rev(tmp))
+#cbind combines the two vectors
+#rev takes the vector and reverses it so that it is a 2 colum structure 
+plot(x)
+
+```
+
+#k-means cluster 
+The main k-means function in R is called "kmeans()". 
+Let's play with it here.
+
+#Use the kmeans() function setting k to 2 and nstart=20
+
+```{r}
+
+cluster <- kmeans(x, centers =2, nstart=20)
+cluster 
+
+```
+
+#Inspect/print the results
+Q. How many points are in each cluster? There are 2 clusters and 30 points in each.
+
+Q. What ‘component’ of your result object details
+ - cluster size? each cluster has a size of 30 points. this can be found with cluster is printed out or print out cluster$size
+```{r}
+
+cluster$size
+length(cluster$cluster)
+table(cluster$cluster)
+```
+ 
+ - cluster assignment/membership? in the clustering vector: the first 30 points beling to cluster 1. the last 30 belongs to cluster 2. 
+```{r}
+cluster$cluster
+
+```
+
+ 
+ - cluster center? cluster 1 is centered at (-3.1176, 3.2137). cluster 2 is centered at (3.21, -3.11)
+```{r}
+cluster$centers
+
+```
+ 
+
+#Plot x colored by the kmeans cluster assignment and add cluster centers as blue points
+
+```{r}
+plot(x, col = cluster$cluster)
+points (-3.117681 , 3.213717, col = "blue", pch = 15 )
+points (3.213717, -3.117681, col = "blue", pch = 15 )
+#or
+points ( cluster$centers, col = "blue", pch = 15 )
+```
+
+## Hierarchical clustering in R 
+
+The main hierarchical clustering function in R si called "hclust()". An important point here is that you have to calcualte the distance matrix deom your input before calling hclust(). 
+```{r}
+# First we need to calculate point (dis)similarity
+# as the Euclidean distance between observations
+dist_matrix <- dist(x)
+# The hclust() function returns a hierarchical
+# clustering model
+hc <- hclust(d = dist_matrix)
+# the print method is not so useful here
+hc #priting out hc by itself doesn't really tell you much
+plot(hc)
+```
+
+```{r}
+plot (hc)
+abline ( h = 6, col = "red", lty = 2 )
+# shows that a cut here would leave 2 separate clusters
+abline ( h = 4, col = "blue", lty = 2 )
+```
+
+
+To get cluster membership vector, I need to "cut" the tree at a certain height to yeild my separate cluster branches. 
+
+```{r}
+cutree(hc, h = 6) #this lists the values that are in each cluster. 
+#cluster where the cut at 6 is. 
+```
+
+```{r}
+cutree(hc, h = 4)
+
+```
+
+
+```{r}
+cutree ( hc, k = 8 ) # "k" means cut the tree so that there are 8 groups 
+```
+
+## More practice with hclust() 
+These are 3 groups of data that overlaps. 
+```{r}
+# Step 1. Generate some example data for clustering
+x <- rbind(
+ matrix(rnorm(100, mean=0, sd = 0.3), ncol = 2), # c1
+ matrix(rnorm(100, mean = 1, sd = 0.3), ncol = 2), # c2
+ matrix(c(rnorm(50, mean = 1, sd = 0.3), # c3
+ rnorm(50, mean = 0, sd = 0.3)), ncol = 2))
+colnames(x) <- c("x", "y")
+# Step 2. Plot the data without clustering
+plot(x)
+# Step 3. Generate colors for known clusters
+# (just so we can compare to hclust results)
+col <- as.factor( rep(c("c1","c2","c3"), each=50) )
+plot(x, col=col)
+```
+
+Q. Use the dist(), hclust(), plot() and cutree()
+ functions to return 2 and 3 clusters
+ 
+ 
+ 
+```{r}
+dist_matrix <- dist(x)
+hc <- hclust ( d = dist_matrix)
+plot (hc)
+
+```
+
+
+To get cluster membership vector use "cutree()" and then use "table()" to tabulate up how many
+```{r}
+plot(hc)
+abline ( h = 2.5, col = "red")
+c2 <- cutree ( hc, k = 2 )
+table (c2)
+```
+
+
+```{r}
+plot ( hc)
+abline ( h = 2.2, col = "blue")
+c3 <- cutree ( hc, k = 3 )
+table ( c3)
+```
+ 
+Q. How does this compare to your known 'col' groups?
+
+## Principal Componenet Analysis 
+PC plots are ranked by their importance. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

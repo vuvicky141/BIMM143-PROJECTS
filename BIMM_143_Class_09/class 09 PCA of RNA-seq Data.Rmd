@@ -1,0 +1,6 @@
+---
+title: "CLASS_09 PCA of RNA-Seq Data"
+author: "Vicky Vu"
+date: "2/5/2020"
+output: html_document
+---
