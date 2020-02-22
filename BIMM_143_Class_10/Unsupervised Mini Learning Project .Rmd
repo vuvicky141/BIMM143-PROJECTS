@@ -1,0 +1,201 @@
+---
+title: "Class_10: Unsupervised Learning of HUman Breast Cancer Cells"
+author: "Vicky Vu"
+date: "2/6/2020"
+output: html_document
+---
+Practical PCA issues
+1. Scaling: when the numbers are too different, you can scale using prcomp(x, scale = TRUE). 
+
+# 1. Analysis of Human Breast Cancer Cells  
+Input: read, View/head 
+PCA: prcomp
+cluster: kmeans, hclust 
+compare: plot, table, etc. 
+
+##Preaprnig the data
+
+First load the data into R markdown. I downloaded the CSV file from the class website. 
+
+```{r}
+wisc.df <- read.csv("WisconsinCancer.csv") 
+head(wisc.df)
+```
+
+There's an "X" column with "NA" thar came from excel (col 33). We can keep it there but we don't want to work with it in our analysis. We also don't want to work with the ID column either. 
+
+as.matrix() allows us to choose which columns to work with. 
+
+
+```{r}
+# Convert the features of the data: wisc.data
+wisc.data <- as.matrix ( wisc.df[,3:32] )
+head(wisc.data)
+```
+
+
+## Exploratory Data Analysis 
+Q1 : how many patients are in this data set?
+```{r}
+nrow(wisc.df)
+```
+Q2 : How many of the observations have a malignant diagnosis?
+```{r}
+table (wisc.df$diagnosis)
+```
+Q : How many variables/features in the data are suffixed with _mean?
+```{r}
+#colnames(wisc.data) to recall the names 
+#grep("_mean", wisc.data) to sort out the names with "_mean"
+grep ( "_mean", colnames(wisc.data), value = TRUE)
+
+```
+```{r}
+length ( grep ( "_mean", colnames(wisc.data), value = TRUE)
+)
+```
+
+# 2. Principle Component Analysis 
+
+## Performing PCA 
+
+Before we turn to PCA, we need to think whether we should scale our input.To do this, check the mean and standard deviation of the column. Use colMeans() and apply() functions. 
+```{r}
+colMeans( wisc.data )
+apply(wisc.data, 2, sd ) # 1 for rows, 2 for columns. This apply function can be done with any other function, not just sd. 
+
+round( apply(wisc.data, 2, sd )    ,2) # this makes the numbers not in scientific notation 
+```
+
+Looks like we need to set scale=TRUE!!
+
+```{r}
+# Perform PCA on wisc.data by completing the following code
+wisc.pr <- prcomp( wisc.data, scale=TRUE )
+summary(wisc.pr) # this function tells us a summary of variance. PC1 has 44% PC2 has 18%, cumulative for PC2 is 44+18 = 63% 
+```
+
+Q4. From your results, what proportion of the original variance is captured by the first principal components (PC1)?
+
+The 1st PC captures 44.27% of the original variance. 73.6% are captured in the first 3 PCs
+
+Q5. How many principal components (PCs) are required to describe at least 70% of the original variance in the data?
+
+Q6. How many principal components (PCs) are required to describe at least 90% of the original variance in the data
+
+## Interpreting PCA results
+
+Let's do some figures...
+
+```{r}
+biplot(wisc.pr)
+```
+This looks so messy and we can't get anything out of this! We need to do our own PC1 and PC2 plot and lets color by the diagnosis. 
+
+```{r}
+attributes(wisc.pr) #tells me all the stuff thats in the results
+```
+
+Plotting PC1 v. PC2 
+```{r}
+
+plot (  wisc.pr$x[,1], wisc.pr$x[,2]  , col=wisc.df$diagnosis)  #the first component is stdv, rotation, center, scale, x 
+#the second component is prcomp 
+#wisc.df$diagnosis is B (black) or M (red)
+#$x is the scores of the PCAs 
+abline( h= 0, col = "gray", lty = 2 )
+abline ( v = 0 , col = "gray" , lty = 2 )
+```
+
+## Variance Explained 
+Here we will make scree plots showing the porportion of variance explained as the number of principal components increases. 
+
+
+# 3. Hierarchical Clustering
+
+## Hierarchical clustering of case data
+### Cluster in PC space 
+
+First lets see if we can cluster the original data. 
+kmeans( x, centers = number of clusters, nstart = number of runs done)
+hclust ( dist ( x))
+
+```{r}
+# we'll try hclust first 
+
+wisc.hc <- hclust ( dist(wisc.data))
+plot (wisc.hc)
+```
+There are 2 groups and that's all we can see in this dendogram. Yikes! 
+
+
+# 5. Combining methods 
+Just clustering the data by itself isn't very helful. 
+
+Instead, of the raw input data, wisc.data, why don't we give the results of the PCA results. We're combining methods here. Assign the results to wisc.pr.hclus.
+
+```{r}
+wisc.pr.hclust <- hclust ( dist(wisc.pr$x[,1:3]), method = "ward.D2")
+
+plot (wisc.pr.hclust )
+```
+Here we can clearly see 2 main groups. 
+Now we will use cutree(HL, k = number of groups) to get us more info. 
+
+```{r}
+grps <- cutree(wisc.pr.hclust, k=2)
+table(grps)
+```
+```{r}
+plot ( wisc.pr$x [,1], wisc.pr$x[,2], col = grps)
+```
+
+We can use the `table()` function to compare the $diagnosis vector with our cluster results vector.
+```{r}
+table(grps, wisc.df$diagnosis)
+```
+
+
+
+```{r}
+plot(wisc.pr$x[,1:2], col=wisc.df$diagnosis)
+```
+
+
+# 6. Sensitivity / Specificity 
+
+# 7. Prediction 
+
+We will use the predict() function that will take our PCA model from before and new cancer cell data and project that data onto our PCA space.
+
+```{r}
+#url <- "new_samples.csv"
+url <- "https://tinyurl.com/new-samples-CSV"
+new <- read.csv(url)
+```
+
+Use the predit () function with our previous PCA model and new data. This combines our data into one plot. 
+```{r}
+npc <- predict(wisc.pr, newdata=new)
+npc
+```
+
+Now draw the PCA plot again and add out new data. 
+```{r}
+plot(wisc.pr$x[,1:2], col=wisc.df$diagnosis)
+
+# PC points from the new data will be added with this code.
+points(npc[,1], npc[,2], col="blue", pch=16, cex=3)
+
+text(npc[,1], npc[,2], c(1,2), col="white")
+```
+Q17. Which of these new patients should we prioritize for follow up based on your results?
+
+Patient 2 
+
+
+
+
+
+
+
