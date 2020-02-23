@@ -1,5 +1,5 @@
 ---
-title: "new12"
+title: "Structural Bioinormatics Part 1."
 author: "Vicky Vu"
 date: "2/13/2020"
 output: github_document

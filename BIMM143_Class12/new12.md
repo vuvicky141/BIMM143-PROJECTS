@@ -1,4 +1,4 @@
-new12
+Structural Bioinormatics Part 1.
 ================
 Vicky Vu
 2/13/2020
