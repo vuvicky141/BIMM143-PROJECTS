@@ -1,0 +1,41 @@
+---
+title: "Analyzing RNA-Seq by genome results"
+output: github_document
+---
+Section 4: Population Scale Analysis 
+One sample is obviously not enough to know what is happening in a population. You are
+interested in assessing genetic differences on a population scale. So, you processed
+about ~230 samples and did the normalization on a genome level. Now, you want to find
+whether there is any association of the 4 asthma-associated SNPs (rs8067378…) on
+ORMDL3 expression.
+
+```{r}
+expr <- read.table("expression_value.txt")
+head(expr)
+summary(expr)
+```
+
+Caculate the avgerage expression level of A/A. 
+Extract the A/A rows 
+```{r}
+inds <- expr$geno == "A/A"
+expr[inds,]
+```
+
+```{r}
+inds <- expr$geno == "A/A"
+summary(expr[inds,]$expr)
+mean(expr[inds,]$exp)
+```
+
+Calculate teh average expression level of G/G
+```{r}
+inds <- expr$geno == "G/G"
+summary(expr[inds,]$expr)
+mean(expr[inds,]$exp)
+```
+
+```{r}
+boxplot( exp~geno , data=expr, notch = TRUE)
+```
+
